@@ -225,7 +225,7 @@ if st.button("Generate Safety Report"):
         compliance_checker = VideoComplianceChecker()
         video_data = video_data[video_data.find('{'): len(video_data) - video_data[::-1].find("}")]
         # st.write(video_data)
-        parsed_json = json.loads(json_string)
+        parsed_json = json.loads(video_data)
         pretty_json = json.dumps(parsed_json, indent=4)
         
         # Display the pretty-printed JSON string as code in Streamlit
