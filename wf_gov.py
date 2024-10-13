@@ -379,7 +379,7 @@ def run_workflow(inp):
 st.title("AI Governance Workflow")  
 st.write("This AI governance workflow checks for prompt safety, engineers the prompt, generates an output, and evaluates it for bias and hallucination.")
 
-import streamlit as st
+# import streamlit as st
 
 # Sidebar customization options
 st.sidebar.header("Customization Options")
@@ -436,6 +436,7 @@ max_retries = st.sidebar.number_input(
 # Apply button
 if st.sidebar.button("Apply Settings"):
     st.sidebar.success("Settings applied successfully!")
+
 
 inp = st.text_input("Enter your query:")
 
