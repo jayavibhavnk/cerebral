@@ -13,7 +13,7 @@ class VideoAnalysis:
         # self.index_name = index_name
         self.client = TwelveLabs(api_key=self.api_key)
         self.index_id = "670b4810eaac6725641d655f"
-        self.video_ids = ["670bd5cd9da39d4c05a1efaa"]  # List to store video IDs
+        self.video_ids = ["670bd5cd9da39d4c05a1efaa", "670c219d9da39d4c05a1effb"]  # List to store video IDs
         self.video_id_new = ""
 
     def create_index(self):
