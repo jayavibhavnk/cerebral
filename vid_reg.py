@@ -224,7 +224,12 @@ if st.button("Generate Safety Report"):
         # Process and display the compliance result
         compliance_checker = VideoComplianceChecker()
         video_data = video_data[video_data.find('{'): len(video_data) - video_data[::-1].find("}")]
-        st.write(video_data)
+        # st.write(video_data)
+        parsed_json = json.loads(video_data)
+        
+        # Pretty print the JSON
+        pretty_json = json.dumps(parsed_json, indent=2)
+        st.write(pretty_json)
         video_data = json.loads(video_data)
         result = compliance_checker.check_compliance(video_data)
         st.write(result)
