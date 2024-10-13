@@ -219,7 +219,7 @@ if st.button("Generate Safety Report"):
 
     video_id = video_analysis.video_ids[-1]
     # st.write(video_id)
-    video_data = video_analysis.generate_safety_report(video_id)
+    video_data = video_analysis.generate_safety_report(video_analysis.video_id_new)
     # st.write(video_data)
 
     if video_data:
