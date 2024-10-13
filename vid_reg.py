@@ -2,15 +2,10 @@ import streamlit as st
 import json
 from twelvelabs import TwelveLabs
 from twelvelabs.models.task import Task
-import streamlit as st
-import json
-from twelvelabs import TwelveLabs
-from twelvelabs.models.task import Task
 
 class VideoAnalysis:
     def __init__(self):
         self.api_key = "tlk_14G0MC31C66JK62SNTX2K1MAX2AR"
-        # self.index_name = index_name
         self.client = TwelveLabs(api_key=self.api_key)
         self.index_id = "670b4810eaac6725641d655f"
         self.video_ids = ["670bd5cd9da39d4c05a1efaa", "670c219d9da39d4c05a1effb"]  # List to store video IDs
@@ -60,6 +55,9 @@ class VideoAnalysis:
             st.success(f"Video uploaded successfully. Video ID={task.video_id}")
             self.video_ids.append(str(task.video_id))
 
+            # Update session state with the new video ID
+            st.session_state.video_id = str(task.video_id)
+
     def list_videos(self):
         if not self.index_id:
             st.error("Index ID not found. Create or load an index first.")
@@ -94,7 +92,6 @@ class VideoAnalysis:
                 video_id=video_id,
                 prompt=prompt
             )
-            # st.success(f"Safety report for video {video_id}: {res.data}")
             return res.data
         
         except Exception as e:
@@ -103,7 +100,7 @@ class VideoAnalysis:
 
 class VideoComplianceChecker:
     def __init__(self):
-         self.country_regulations = {
+        self.country_regulations = {
             "USA": {
                 "Explicit Nudity": ("No", None),
                 "Sexual Content": ("No", None),
@@ -201,10 +198,10 @@ class VideoComplianceChecker:
 
 st.title("Video Content Regulation Checker")
 
-# api_key = st.text_input("Enter API Key", type="password")
-# index_name = st.text_input("Enter Index Name")
+# Initialize session state for video_id if it doesn't exist
+if 'video_id' not in st.session_state:
+    st.session_state.video_id = None
 
-# if api_key and index_name:
 video_analysis = VideoAnalysis()
 st.info("Video analysis initialized.")
 
@@ -221,23 +218,23 @@ if st.button("Upload and Index Video") and video_file:
 
 if st.button("Generate Safety Report"):
 
-    video_id = video_analysis.video_ids[-1]
-    # st.write(video_id)
-    video_data = video_analysis.generate_safety_report(video_id)
-    # st.write(video_data)
+    video_id = st.session_state.video_id or video_analysis.video_ids[-1]  # Use session state if available
+    if video_id:
+        video_data = video_analysis.generate_safety_report(video_id)
 
-    if video_data:
-        # Process and display the compliance result
-        compliance_checker = VideoComplianceChecker()
-        video_data = video_data[video_data.find('{'): len(video_data) - video_data[::-1].find("}")]
-        # st.write(video_data)
-        parsed_json = json.loads(video_data)
-        pretty_json = json.dumps(parsed_json, indent=4)
-        
-        # Display the pretty-printed JSON string as code in Streamlit
-        st.code(pretty_json, language="json")
-        video_data = json.loads(video_data)
-        result = compliance_checker.check_compliance(video_data)
-        st.write(result)
+        if video_data:
+            # Process and display the compliance result
+            compliance_checker = VideoComplianceChecker()
+            video_data = video_data[video_data.find('{'): len(video_data) - video_data[::-1].find("}")]
+            parsed_json = json.loads(video_data)
+            pretty_json = json.dumps(parsed_json, indent=4)
+            
+            # Display the pretty-printed JSON string as code in Streamlit
+            st.code(pretty_json, language="json")
+            video_data = json.loads(video_data)
+            result = compliance_checker.check_compliance(video_data)
+            st.write(result)
+        else:
+            st.error("No video uploaded. Please upload a video first.")
     else:
-        st.error("No video uploaded. Please upload a video first.")
+        st.error("No video ID found. Please upload a video first.")
