@@ -210,7 +210,7 @@ if st.button("Create Index"):
 
 video_file = st.file_uploader("Upload a Video", type=["mp4", "mov", "avi"])
 
-if st.button("Upload and Analyze Video") and video_file:
+if st.button("Upload and Index Video") and video_file:
     video_analysis.upload_video(video_file)
 
 if st.button("Generate Safety Report"):
