@@ -10,6 +10,7 @@ class VideoAnalysis:
         self.client = TwelveLabs(api_key=self.api_key)
         self.index_id = "670b4810eaac6725641d655f"
         self.video_ids = ["670bd5cd9da39d4c05a1efaa"]  # List to store video IDs
+        self.video_id_new = ""
 
     def create_index(self):
         try:
@@ -51,6 +52,7 @@ class VideoAnalysis:
         if task.status != "ready":
             st.error(f"Indexing failed with status {task.status}")
         else:
+            self.video_id_new = task.video_id
             st.success(f"Video uploaded successfully. Video ID={task.video_id}")
             self.video_ids.append(str(task.video_id))
 
