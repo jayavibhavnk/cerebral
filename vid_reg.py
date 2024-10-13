@@ -206,7 +206,7 @@ video_analysis = VideoAnalysis()
 st.info("Video analysis initialized.")
 
 # Add a button to create the index
-if st.button("Create Index"):
+if st.button("Initialize Index"):
     video_analysis.create_index()
     if video_analysis.index_id:
         st.info(f"Index created successfully. ID: {video_analysis.index_id}")
