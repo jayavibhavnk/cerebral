@@ -222,7 +222,7 @@ class AIGovernanceWorkflow(Workflow):
         print(ev.first_input)
         # print(prompt_safe("what is the capital of france"))
         input1 = ev.first_input
-        safety_result = json.loads(prompt_safe("what is the capital of france"))
+        safety_result = json.loads(prompt_safe(ev.first_input))
         print(safety_result)
         if safety_result.get('safety') != 'safe':
             ctx.write_event_to_stream(ProgressEvent(msg="Input is unsafe. Stopping workflow."))
@@ -378,6 +378,64 @@ def run_workflow(inp):
 
 st.title("AI Governance Workflow")  
 st.write("This AI governance workflow checks for prompt safety, engineers the prompt, generates an output, and evaluates it for bias and hallucination.")
+
+import streamlit as st
+
+# Sidebar customization options
+st.sidebar.header("Customization Options")
+
+# Model selection
+model_option = st.sidebar.selectbox(
+    "Select Model",
+    ["azure/gpt-4o", "azure/gpt-3.5-turbo", "claude-3-opus-20240229"]
+)
+
+# Safety threshold
+safety_threshold = st.sidebar.slider(
+    "Safety Threshold",
+    min_value=0,
+    max_value=100,
+    value=80,
+    help="Set the safety threshold for prompt injection check"
+)
+
+# Bias threshold
+bias_threshold = st.sidebar.slider(
+    "Bias Threshold",
+    min_value=0,
+    max_value=100,
+    value=10,
+    help="Set the threshold for acceptable bias percentage"
+)
+
+# Hallucination threshold
+hallucination_threshold = st.sidebar.slider(
+    "Hallucination Threshold",
+    min_value=0,
+    max_value=100,
+    value=10,
+    help="Set the threshold for acceptable hallucination percentage"
+)
+
+# Toggle for online search
+use_online_search = st.sidebar.checkbox(
+    "Use Online Search",
+    value=True,
+    help="Enable or disable online search to supplement the prompt"
+)
+
+# Maximum retries
+max_retries = st.sidebar.number_input(
+    "Maximum Retries",
+    min_value=1,
+    max_value=5,
+    value=2,
+    help="Set the maximum number of retries for biased or hallucinated outputs"
+)
+
+# Apply button
+if st.sidebar.button("Apply Settings"):
+    st.sidebar.success("Settings applied successfully!")
 
 inp = st.text_input("Enter your query:")
 
