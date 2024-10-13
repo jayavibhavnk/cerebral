@@ -2,19 +2,24 @@ import streamlit as st
 import json
 from twelvelabs import TwelveLabs
 from twelvelabs.models.task import Task
+import streamlit as st
+import json
+from twelvelabs import TwelveLabs
+from twelvelabs.models.task import Task
 
 class VideoAnalysis:
     def __init__(self):
         self.api_key = "tlk_14G0MC31C66JK62SNTX2K1MAX2AR"
+        # self.index_name = index_name
         self.client = TwelveLabs(api_key=self.api_key)
-        self.index_id = st.session_state.get("index_id", None)
-        self.video_ids = st.session_state.get("video_ids", [])
+        self.index_id = "670b4810eaac6725641d655f"
+        self.video_ids = ["670bd5cd9da39d4c05a1efaa"]  # List to store video IDs
         self.video_id_new = ""
 
     def create_index(self):
         try:
             index = self.client.index.create(
-                name="my_index",  # You might want to pass this as a parameter
+                name=self.index_name,
                 engines=[
                     {
                         "name": "pegasus1.1",
@@ -23,7 +28,6 @@ class VideoAnalysis:
                 ]
             )
             self.index_id = index.id
-            st.session_state.index_id = self.index_id  # Store in session state
             st.success(f"Created index: id={self.index_id}")
         except Exception as e:
             st.error(f"Index already exists or error occurred: {e}")
@@ -55,7 +59,6 @@ class VideoAnalysis:
             self.video_id_new = task.video_id
             st.success(f"Video uploaded successfully. Video ID={task.video_id}")
             self.video_ids.append(str(task.video_id))
-            st.session_state.video_ids = self.video_ids  # Store in session state
 
     def list_videos(self):
         if not self.index_id:
@@ -66,7 +69,6 @@ class VideoAnalysis:
             videos = self.client.index.video.list(self.index_id)
             for video in videos:
                 self.video_ids.append(video.id)
-                st.session_state.video_ids = self.video_ids  # Update session state
                 st.info(f"Video ID: {video.id}")
 
             if not self.video_ids:
@@ -92,6 +94,7 @@ class VideoAnalysis:
                 video_id=video_id,
                 prompt=prompt
             )
+            # st.success(f"Safety report for video {video_id}: {res.data}")
             return res.data
         
         except Exception as e:
@@ -100,7 +103,7 @@ class VideoAnalysis:
 
 class VideoComplianceChecker:
     def __init__(self):
-        self.country_regulations = {
+         self.country_regulations = {
             "USA": {
                 "Explicit Nudity": ("No", None),
                 "Sexual Content": ("No", None),
@@ -198,6 +201,10 @@ class VideoComplianceChecker:
 
 st.title("Video Content Regulation Checker")
 
+# api_key = st.text_input("Enter API Key", type="password")
+# index_name = st.text_input("Enter Index Name")
+
+# if api_key and index_name:
 video_analysis = VideoAnalysis()
 st.info("Video analysis initialized.")
 
@@ -213,22 +220,24 @@ if st.button("Upload and Index Video") and video_file:
     video_analysis.upload_video(video_file)
 
 if st.button("Generate Safety Report"):
-    if video_analysis.video_ids:
-        video_id = video_analysis.video_ids[-1]  # Use the last uploaded video ID
-        video_data = video_analysis.generate_safety_report(video_analysis.video_id_new)
 
-        if video_data:
-            # Process and display the compliance result
-            compliance_checker = VideoComplianceChecker()
-            video_data = video_data[video_data.find('{'): len(video_data) - video_data[::-1].find("}")]
-            parsed_json = json.loads(video_data)
-            pretty_json = json.dumps(parsed_json, indent=4)
+    video_id = video_analysis.video_ids[-1]
+    # st.write(video_id)
+    video_data = video_analysis.generate_safety_report(video_analysis.video_id_new)
+    # st.write(video_data)
 
-            # Display the pretty-printed JSON string as code in Streamlit
-            st.code(pretty_json, language="json")
-            result = compliance_checker.check_compliance(parsed_json)
-            st.write(result)
-        else:
-            st.error("No video uploaded. Please upload a video first.")
+    if video_data:
+        # Process and display the compliance result
+        compliance_checker = VideoComplianceChecker()
+        video_data = video_data[video_data.find('{'): len(video_data) - video_data[::-1].find("}")]
+        # st.write(video_data)
+        parsed_json = json.loads(video_data)
+        pretty_json = json.dumps(parsed_json, indent=4)
+        
+        # Display the pretty-printed JSON string as code in Streamlit
+        st.code(pretty_json, language="json")
+        video_data = json.loads(video_data)
+        result = compliance_checker.check_compliance(video_data)
+        st.write(result)
     else:
-        st.error("No video available for analysis.")
+        st.error("No video uploaded. Please upload a video first.")
