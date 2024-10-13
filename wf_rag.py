@@ -1,5 +1,5 @@
 import streamlit as st
-
+import os
 # st.title("RAG Workflow Chatbot")
 # st.write("This app runs a Retrieval-Augmented Generation workflow.")
 # inp = st.text_input("Enter your query:")
