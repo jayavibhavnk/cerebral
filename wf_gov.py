@@ -307,10 +307,10 @@ class AIGovernanceWorkflow(Workflow):
         t=f'"Evaluation Scores": {d}, "Bias": {b}, "Hallucination": {h}'
         
 # Convert single quotes to double quotes for valid JSON
-        t = t.replace("'", '"')
+        # t = t.replace("'", '"')
 
         # Parse the string into a dictionary
-        data = json.loads("{" + t + "}")
+        # data = json.loads("{" + t + "}")
 
         # Format the output
         # output = "Evaluation Scores:\n"
@@ -330,7 +330,7 @@ class AIGovernanceWorkflow(Workflow):
 
         # print(output)
 
-        ctx.write_event_to_stream(ProgressEvent(msg=f"{data}"))
+        ctx.write_event_to_stream(ProgressEvent(msg=f"{t}"))
 
         if int(b.get('bias_percentage')) > 10 or int(h.get('hallucination_percentage')) > 10:
             ctx.write_event_to_stream(ProgressEvent(msg="Output is biased or hallucinated. Regenerating..."))
